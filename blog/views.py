@@ -337,8 +337,12 @@ def campgroundopen(request):
 
 
             
-
-
+        
+    try : 
+        a =  request.session['username']
+    except : 
+        request.session['username'] = None 
+        
     return  render(request , 'campgrounds/show.html' , {'username' :  request.session['username'] }   )
 
 
