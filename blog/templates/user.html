@@ -1,0 +1,68 @@
+{% extends "partials/header.html" %}
+{% block content %}
+{% load static %}
+
+
+
+
+<div class="container ">
+    <div class="scrollmenu">
+
+        {% for rec in history  %}
+
+        <div class="col-md-4 col-sm-6">
+            <div class="thumbnail">
+              <img src="{% static  rec.image  %}">
+               <div class="caption">
+                   <h4> {{ rec.title }} </h4>
+               </div>
+               <p>
+                   
+        
+                
+        
+        
+                   <form action="campgroundopen" method="get">
+        
+                    <input type="submit" value="more info" >
+                       <input type="hidden" value="{{rec.id}}" id="name" name="ids"  >
+                                           </form>
+        
+        
+                                           
+               </p>
+            </div>
+        </div>
+        
+        
+        {% endfor %}
+        
+        
+
+    </div>
+
+
+</div>
+
+<div class="container">
+<h1>Change password 
+</h1>
+
+<form class="form-group" method="post" action="changepass">
+    {% csrf_token %}
+                
+    <label>New password </label>
+    <input class="form-control"  type="password" name="password1" >
+    <label>
+        Repeat the password
+    </label>
+    <input class="form-control" type="password" name="password2">
+    <input class="btn btn-lg btn-primary btn-block" type="submit">
+ 
+</form>
+</div>
+
+
+
+
+{% endblock content  %}

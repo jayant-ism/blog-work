@@ -1,0 +1,61 @@
+
+{% extends "partials/header.html" %}
+{% load static %}
+{% block content %}
+
+
+<header class="jumbotron" style="background-image: linear-gradient(to bottom right, rgb(233, 187, 135), rgb(174, 207, 202));">
+         <div class="container">
+             <h1><span class="glyphicon glyphicon-globe "></span> Welcome To YourBlog!</h1>
+             <p>View our Blogs from different people of all communities.</p>
+            
+            {% if  doi == 1 %}
+             <p>
+                <a class="btn btn-primary btn-lg" href="add">Add New Blog</a>
+             </p>
+
+
+             {% endif %}
+         </div>
+     </header>
+     
+     <div class="row text-center" style="display:flex; flex-wrap: wrap;">
+        {% for campground in campgrounds %}
+            <div class="col-md-4 col-sm-6">
+                <div class="thumbnail">
+                  <img src="{% static  campground.image  %}">
+                   <div class="caption">
+                       <h4> {{ campground.title }} </h4>
+                   </div>
+                   <p>
+                    {{ campground.id }}
+
+                       <form action="campgroundopen" method="get">
+        
+                        <input type="submit" value="more info" >
+                           <input type="hidden" value="{{campground.id}}" id="name" name="ids"  >
+                                               </form>
+
+
+                                               {% if  doi == 1 %}
+                                               
+                                               
+                       <form action="deletepost" method="post">
+                        {% csrf_token %}
+                
+        
+                        <input type="submit" value="delete" >
+                           <input type="hidden" value="{{campground.id}}" id="name" name="ids"  >
+                                 
+                                  </form>
+                                  
+                                               {% endif %}
+
+                                               
+                   </p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+{% endblock content %}

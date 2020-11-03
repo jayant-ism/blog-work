@@ -1,0 +1,132 @@
+{% extends "partials/header.html" %}
+{% block content %}
+{% load static %}
+
+
+
+
+<div class="container " id="tempo">
+<h2 ><a style="color:black;">{{campground.title}}</a></h2>
+    <div class="row" >
+        
+        <div class="col-md-9" >
+            <div class="thumbnail">
+                <img class="img-responsive"  src="{% static  campground.image  %}">
+                <div class="caption-full">
+                    <h4 class="pull-right"></h4>
+                    <!-- <h4><a><%=campground.name%></a></h4> -->
+                    <p>{{ campground.desc }}</p>
+                    <p>
+                        <em>Submitted By {{ campground.author.username }}</em>
+                    </p>
+                    {% if currentUser and campground.author.id == currentUser.id %}
+                        <a class="btn btn-warning" href="/campgrounds/{{ campground.id }}/edit">Edit Blog</a>
+                    {% endif %}
+                </div>
+                
+
+                <video width="300" height="240" controls  >
+                    <source src="{% static campground.videos  %}" type='video/mp4' >
+                        
+                  Your browser does not support the video tag.
+                  </video>
+
+
+
+
+            </div>
+
+
+
+            
+            <div class="well">
+                <div class="text-right">
+
+                    <button class="btn btn-success" onclick=addcomment() >
+                                Add thoughts 
+
+                    </button>
+
+                   <!-- <a class="btn btn-success" href="/campgrounds/{{ campground.ids }}/comments/new">Add New Comment</a>
+                -->
+            </div>
+            
+
+            <div  class="container" style="visibility: hidden " id="thisone">
+                <form  class="form-group" action="campgroundaddcom" method="GET" >
+                    <textarea row="10" col="102" name="addcomment"></textarea>
+                    <input type="hidden" value= "{{campground.id}}" name="blogidnh"> 
+                    <input type="submit" > 
+                </form>
+            </div>
+
+
+                <hr>
+                {% for comment in comments  %}
+                    <div class="row">
+                        <div class="col-md-12">
+                            <strong>{{ comment.user }}</strong>
+                            
+                       <div>
+                           {{ comment.desc }} 
+
+                            {%if currentUser and comment.author.id == currentUser.id %}
+                                <form style="display: inline" class="pull-right" action="/campgrounds/{{campground.id}}/comments/{{comment.id}}?_method=DELETE" method="POST">
+                                    <button class="btn btn-xs btn-danger">DELETE</button>
+                                    <a href="/campgrounds/{{campground.id}}/comments/{{comment.id}}/edit" class="btn btn-xs btn-info">EDIT</a>
+                                </form>
+                            {% endif %}
+                       </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    </div>
+
+    
+    <h2>
+        Recommended
+    </h2>
+
+    {% for rec in recom  %}
+
+    <div class="col-md-4 col-sm-6">
+        <div class="thumbnail">
+          <img src="{% static  rec.image  %}">
+           <div class="caption">
+               <h4> {{ rec.title }} </h4>
+           </div>
+           <p>
+               
+
+            
+
+
+               <form action="campgroundopen" method="get">
+
+                <input type="submit" value="more info" >
+                   <input type="hidden" value="{{rec.id}}" id="name" name="ids"  >
+                                       </form>
+
+
+                                       
+           </p>
+        </div>
+    </div>
+    
+
+    {% endfor %}
+
+
+    
+    <script>
+        function addcomment() {
+            document.getElementById("thisone").style.visibility = "visible";
+
+        }
+
+    </script>
+
+{% endblock content %}

@@ -1,0 +1,184 @@
+{% extends "partials/header.html" %}
+{% load static %}
+
+{% block content %}
+
+
+<div class="container" >
+    
+    
+    <div class="card text-white" style="background-color:cadetblue; color:white ; padding-left: 100px;padding-top: 10px;padding-bottom: 10px;"> 
+        <div class="card-body">
+            <form method="post"  action="comallo">
+                {% csrf_token %}
+                <label>
+                Email
+                </label>
+                <input type="email"  name = "email"> 
+                
+                
+                <input type="submit" class="btn btn-default" > 
+                
+                </form>
+            
+
+
+        </div>
+      </div>
+      <br>
+      
+</div>
+<br>
+      <div class="container" >
+    
+      <div class="card text-white" style="background-color:cadetblue; color:white ; padding-left: 100px;padding-top: 10px;padding-bottom: 10px;">
+        <div class="card-body">
+            
+            <h1> Current added users </h1>
+
+            {%  for nam in allowance %} 
+    
+            <div class="container" >
+                <form method="post" action="comrem">
+                    {% csrf_token %}
+                    <label>
+                        
+                {{ nam }}
+                
+                    </label>
+                
+                <input type="hidden" value="{{nam}}" name="userid"  >
+                 
+                <input type="submit" class="btn btn-default" value="remove it"> 
+                </form>
+            
+                
+      
+
+                {% endfor %}
+
+        </div>
+      </div>
+
+      </div>
+      
+      <br>
+      
+      
+</div>
+<br>
+      <div class="container" >
+    
+
+      <div class="card text-white" style="background-color: cornflowerblue; color:white ; padding-left: 100px;padding-top: 10px;padding-bottom: 10px;">
+        <div class="card-body">
+            
+            
+<form action="iconchange" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <label>
+        <h1>
+        Logo change
+    </h1>
+    </label>
+    
+
+    <input type="file" name="img" >
+    
+                <input type="submit" class="btn btn-default">
+    </form>
+
+
+        </div>
+      </div>
+      <br>
+        
+</div>
+<br>
+      <div class="container" >
+    
+    
+      <div class="card text-white" style="background-color:cadetblue; color:white ; padding-left: 100px;padding-top: 10px;padding-bottom: 10px; padding-right:100px ;">
+        <div class="card-body">
+            
+            <form method="post" action="descadd">
+                {% csrf_token %}
+                <label>
+                    <h1>
+                        Descripton
+                    </h1>
+                </label>
+                
+                <textarea class="form-control" name="desc" style="margin-right: 10px;">
+          
+                </textarea>
+            
+                
+                <input type="submit" class="btn btn-default">
+            </form>
+    
+            
+        </div>
+      </div>
+      <br>
+      
+</div>
+<br>
+      <div class="container" >
+      
+    
+      <div class="card text-white" style="background-color:cadetblue; color:white ; padding-left: 100px;padding-top: 10px;padding-bottom: 10px;">
+        <div class="card-body">
+            <form action="imgchange" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <label>
+                    <h1>
+                        Background image change
+                     </h1>
+                </label>
+            
+                <input type="file" name="img" >
+                
+                <input type="submit" class="btn btn-default">
+                </form>
+        
+   
+                
+        </div>
+      </div>
+      <br>
+      
+      
+</div>
+<br>
+      <div class="container" >
+    
+      <div class="card text-white" style="background-color:cadetblue; color:white ; padding-left: 100px;padding-top: 10px;padding-bottom: 10px;">
+        <div class="card-body">
+            <form action="iconchange" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+            
+                <label>
+                    Logo change
+                </label>
+                
+            
+                <input type="file" name="img" >
+                
+                <input type="submit" class="btn btn-default">
+                </form>
+        
+                
+        </div>
+      </div>
+      <br>
+      
+      
+</div>
+
+
+  
+
+
+{% endblock content %}

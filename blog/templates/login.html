@@ -1,0 +1,27 @@
+{% extends "partials/header.html" %}
+{% block content %}
+<div class="container" id="loginpage">
+    <div class="row">
+        <h2 style="color: #238cce;">Welcome Back!</h2>
+    <h2 style="color: #238cce;">Please Login to Proceed</h2>
+        <h1 style="text-align: center">Login</h1>
+        <div >
+            <form action="/login" method="post">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <input class="form-control" type="text" name="email" placeholder="email">
+                </div>
+                <div class="form-group">
+                    <input class="form-control" type="password" name="password" placeholder="password">
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-lg btn-primary btn-block">Login</button>
+                </div>
+            </form>
+            <a href="/campgrounds">Go Back</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
