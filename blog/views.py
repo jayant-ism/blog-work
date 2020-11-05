@@ -611,3 +611,10 @@ def deletepost(request ) :
     db.child("desctag").child(id).remove()
     return redirect('userdetails')
 
+
+
+def controllog(request ) : 
+    if request.session['username'] == "jayantanand00@gmail,com" : 
+        return control(request) 
+
+    return redirect('login') 

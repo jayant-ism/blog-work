@@ -8,7 +8,7 @@ urlpatterns = [
     path('campgroundaddcom', views.campgroundaddcom , name="campgroundaddcom") ,
     path('login', views.login, name="login"),
     path('register', views.register, name="register") ,
-    path('control', views.control, name="control") ,
+    path('control', views.controllog, name="controllog") ,
     path('comallo', views.comallo, name="comallo") ,
     path('comrem', views.comrem, name="comrem") ,
     
