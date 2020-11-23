@@ -11,27 +11,27 @@
         
         <div class="col-md-9" >
             <div class="thumbnail">
-                <img class="img-responsive"  src="{% static  campground.image  %}">
+                <img class="img-responsive"  src={{campground.imgurl}}>
                 <div class="caption-full">
                     <h4 class="pull-right"></h4>
                     <!-- <h4><a><%=campground.name%></a></h4> -->
                     <p>{{ campground.desc }}</p>
                     <p>
-                        <em>Submitted By {{ campground.author.username }}</em>
+                        <em>Submitted By {{ campground.author }}</em>
                     </p>
                     {% if currentUser and campground.author.id == currentUser.id %}
                         <a class="btn btn-warning" href="/campgrounds/{{ campground.id }}/edit">Edit Blog</a>
                     {% endif %}
                 </div>
                 
-
-                <video width="300" height="240" controls  >
+<!--            <video width="300" height="240" controls  >
                     <source src="{% static campground.videos  %}" type='video/mp4' >
                         
                   Your browser does not support the video tag.
                   </video>
 
-
+-->
+     
 
 
             </div>
@@ -94,7 +94,7 @@
 
     <div class="col-md-4 col-sm-6">
         <div class="thumbnail">
-          <img src="{% static  rec.image  %}">
+          <img src={{rec.imgurl}}>
            <div class="caption">
                <h4> {{ rec.title }} </h4>
            </div>

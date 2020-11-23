@@ -6,8 +6,8 @@
 
 <header class="jumbotron" style="background-image: linear-gradient(to bottom right, rgb(233, 187, 135), rgb(174, 207, 202));">
          <div class="container">
-             <h1><span class="glyphicon glyphicon-globe "></span> Welcome To YourBlog!</h1>
-             <p>View our Blogs from different people of all communities.</p>
+             <h1><span class="glyphicon glyphicon-globe "></span> Welcome To The India Nutopia!</h1>
+          
             
             {% if  doi == 1 %}
              <p>
@@ -23,7 +23,7 @@
         {% for campground in campgrounds %}
             <div class="col-md-4 col-sm-6">
                 <div class="thumbnail">
-                  <img src="{% static  campground.image  %}">
+                  <img src= {{campground.imgurl}}>
                    <div class="caption">
                        <h4> {{ campground.title }} </h4>
                    </div>
