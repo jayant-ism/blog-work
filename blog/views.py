@@ -36,6 +36,7 @@ db = firebase.database()
 
 
 # Create your views here.
+storage = firebase.storage()
 
 
 def getcount() :
@@ -54,6 +55,9 @@ def imagehandle(f  , name) :
         for chunk in f.chunks():
             destination.write(chunk)
 
+    storage.child("images/"+name+".png" ).put('static/image/'+name+'.png')
+
+
 
 def videohandle(f  , name) :
     with open('static/video/'+name+'.mp4', 'wb+') as destination:
@@ -65,20 +69,25 @@ def search(request) :
     tx =str(  request.GET.get('search') )
     if tx =='' :
         return redirect('campgrounds-index')
+
+
+
     sd = db.child('tags').get().val()
     vallied = []
-    for tag in sd :
-        x = len(tx)
-        pos = 1
-        if x > len(tag)  :
-            continue
+    
+    if sd != None  : 
+        for tag in sd :
+            x = len(tx)
+            pos = 1
+            if x > len(tag)  :
+                continue
 
-        for i in range(0 , x ) :
-            if tag[i] != tx[i] :
-                pos = 0
-                break
-        if pos ==1 :
-            vallied.append(tag)
+            for i in range(0 , x ) :
+                if tag[i] != tx[i] :
+                    pos = 0
+                    break
+            if pos ==1 :
+                vallied.append(tag)
 
 
 
@@ -89,16 +98,28 @@ def search(request) :
     for tag  in  vallied :
         vs = db.child("tags").child(tag).get().val()
         for count in vs :
-            if path.exists('static/description/'+count+'.json') :
+            
+            try : 
+                makeit = {} 
+                i = count 
 
-                with open('static/description/'+count+'.json', 'r') as outfile:
-                    makeit = json.load(outfile)
+                makeit["id"]  = i 
+                makeit["title"] = db.child("detail").child(i).child("title").get().val() 
+                makeit["desc"] = db.child("detail").child(i).child("desc").get().val() 
+                print("ok")
 
-                makeit['image'] ='image/'+count+'.png'
+                makeit["imgurl"] = storage.child("images/"+i+".png" ).get_url(None)
+        
+                ret.append(makeit) 
+            except : 
+        
+        
+
+                print("error")
+
+                continue 
 
 
-
-                ret.append(makeit)
 
 
 
@@ -126,14 +147,14 @@ def submit(request) :
 
 
     image = request.FILES['image']
-    video = request.FILES['video']
+  #  video = request.FILES['video']
     desc = request.POST.get('description')
     tag = request.POST.get('tag')
     title = request.POST.get('title')
     count = getcount()
-
+    author = request.POST.get('author')
     imagehandle( image ,  count )
-    videohandle( video ,  count )
+ #   videohandle( video ,  count )
 
 
 
@@ -143,6 +164,7 @@ def submit(request) :
             'id' : count ,
             'title' : title ,
             'desc' : desc ,
+            'author' :  author 
 
 
     }
@@ -170,12 +192,22 @@ def submit(request) :
 
 
 
-    with open('static/description/'+count+'.json', 'w') as outfile:
 
-            json.dump(sd , outfile)
+    try :
+
+        db.child("name").child(count).set(count) 
+        db.child("detail").child(count).set(sd)
+        
+        
+        
+    except : 
+        print("/error")
 
 
-    return redirect('control')
+
+
+
+    return redirect('/')
 def add(request) :
     return  render(request , 'campgrounds/new.html' , { 'username' :  request.session['username'] })
 
@@ -187,7 +219,7 @@ def descadd(request) :
     with open('static/desc.json', 'w') as outfile:
             des = { "des" :  data }
             json.dump(des , outfile)
-    return redirect('control')
+    return redirect('/control')
 
 def imgchange(request) :
 
@@ -229,28 +261,33 @@ def campgroundsindex(request) :
 
 
     ret = []
-    with open('count.json', 'r') as outfile:
-            data = json.load(outfile)
-    count = data['count']
-    counts = int(count)
-    for r in range(0 , counts+1 ) :
-        count = str(r)
-        #taking id as count
-        #
-
-        if path.exists('static/description/'+str(r)+'.json') :
-
-            with open('static/description/'+str(r)+'.json', 'r') as outfile:
-                makeit = json.load(outfile)
-
-            makeit['image'] ='image/'+str(r)+'.png'
 
 
+    list_ids = db.child("name").get().val()  # get the list of count 
+    print(list_ids)
+
+    try : 
+        for i in list_ids : 
+            if i == None :
+                continue 
+
+            makeit = {} 
+
+            makeit["id"]  = i 
+            makeit["title"] = db.child("detail").child(i).child("title").get().val() 
+            makeit["desc"] = db.child("detail").child(i).child("desc").get().val() 
+            print("p")
+
+            makeit["imgurl"] = storage.child("images/"+i+".png" ).get_url(None)
 
             ret.append(makeit)
 
+    except : 
+        print("error occured")
 
-
+        
+    
+    
     viewadd = 0
     user = request.session['username']
 
@@ -262,18 +299,24 @@ def campgroundsindex(request) :
 
 
 def campgroundopen(request):
+    global storage 
 
     if request.method == 'GET' :
-        count =  request.GET.get('ids')
-        with open('static/description/'+count+'.json', 'r') as outfile:
-            makeit = json.load(outfile)
+        i =  request.GET.get('ids')
+        makeit = {} 
+
+        makeit["id"]  = i 
+        makeit["title"] = db.child("detail").child(i).child("title").get().val() 
+        makeit["desc"] = db.child("detail").child(i).child("desc").get().val() 
+        makeit["imgurl"] = storage.child("images/"+i+".png" ).get_url(None )
+
+        makeit["author"] = db.child("detail").child(i).child("author").get().val()
 
 
+        print(makeit) 
 
-        makeit['id'] = count
-
-        makeit['image'] ='image/'+count+'.png'
-        makeit['videos'] ='video/'+count+'.mp4'
+        
+        count = i 
 
         # now make it ready
         commen = {}
@@ -296,6 +339,9 @@ def campgroundopen(request):
 
         if tag != None :
             for tagss in tag :
+                if tagss == None  :
+                    continue  
+
                 print(tagss)
 
                 x = db.child('tags').child(tagss).get().val()
@@ -305,27 +351,48 @@ def campgroundopen(request):
 
 
                     for i in x  :
+                        
 
 
                         if i == None :
+
                             continue
 
                         if i == count :
                             continue
+                        
                         pcd.append(i )
         pcd = set(pcd)
 
+        print( pcd )
+
+
         for i in pcd :
-            if not (path.exists('static/description/'+i+'.json')  ) :
-                continue
-            with open('static/description/'+i+'.json', 'r') as outfile :
-                ass = json.load(outfile)
-            ass['image'] = 'image/'+i +'.png'
+            if i == None :
+                continue  
 
 
-            recomended.append(ass)
-        print("p")
-        print(recomended)
+            try : 
+                makeit2 = {} 
+
+                makeit2["id"]  = i 
+                makeit2["title"] = db.child("detail").child(i).child("title").get().val() 
+                makeit2["desc"] = db.child("detail").child(i).child("desc").get().val() 
+                makeit2["imgurl"] = storage.child("images/"+i+".png" ).get_url(None )
+
+        
+                recomended.append(makeit2) 
+            except : 
+                continue 
+
+            #if not (path.exists('static/description/'+i+'.json')  ) :
+            #    continue
+            #with open('static/description/'+i+'.json', 'r') as outfile :
+            #    ass = json.load(outfile)
+            #ass['image'] = 'image/'+i +'.png'
+
+
+
 
         db.child('history').child(request.session['username']).push( { count : count })
         sd = 0
@@ -361,7 +428,7 @@ def campgroundaddcom(request) :
         desc = request.GET.get('addcomment')
         username = request.session['username']
         if username == None :
-            return  redirect('login')
+            return  redirect('/login')
 
 
 
@@ -405,7 +472,7 @@ def login(request):
         if isd ==  password :
             request.session['username'] = before
             return redirect( '/campgrounds-index')
-        return redirect('login')
+        return redirect('/login')
 
     return render(request, 'login.html' , { 'username' :  request.session['username']  })
 
@@ -441,7 +508,7 @@ def register(request):
 
         error1 = db.child('users').child(before).get().val()
         if error1 != None :
-            return redirect('login')
+            return redirect('/login')
 
         #verified
 
@@ -504,7 +571,7 @@ def comallo(request) :
 
     unt = 0
     if email == None  :
-        return redirect('control')
+        return redirect('/control')
 
     before = ""
     for i in email :
@@ -519,7 +586,7 @@ def comallo(request) :
 
 
 
-    return redirect('control')
+    return redirect('/control')
 
 
 
@@ -537,14 +604,14 @@ def  comrem(request) :
 
 
     db.child('permission').child('post').child(id).remove()
-    return redirect( 'control')
+    return redirect( '/control')
 
 
 
 def userdetails(request) :
 
     if request.session['username'] == None :
-        return  redirect('campgrounds-index')
+        return  redirect('/campgrounds-index')
     recomended =  []
 
     x = db.child('history').child(str(request.session['username'])).get().val()
@@ -554,22 +621,37 @@ def userdetails(request) :
 
     for isd in  x  :
         for  i in  db.child('history').child(str(request.session['username'])).child(isd).get().val() :
-            print(i)
-            if not(path.exists('static/description/' + i + '.json')) :
-                continue
 
-            with open ('static/description/' + i + '.json', 'r') as outfile:
-                ass = json.load(outfile)
+            try : 
+                makeit = {} 
+
+                makeit["id"]  = i 
+                makeit["title"] = db.child("detail").child(i).child("title").get().val() 
+                makeit["desc"] = db.child("detail").child(i).child("desc").get().val() 
+                makeit["imgurl"] = storage.child("images/"+i+".png" ).get_url(None )  
+        
+                recomended.append(makeit) 
+            except : 
+                continue 
 
 
-            ass['id'] = i
-            del ass['desc']
+#            print(i)
+ #           if not(path.exists('static/description/' + i + '.json')) :
+  #              continue
 
-            ass['image'] = 'image/'+i +'.png'
+   #         with open ('static/description/' + i + '.json', 'r') as outfile:
+    #            ass = json.load(outfile)
+
+
+     #       ass['id'] = i
+      #      del ass['desc']
+
+       #     ass['image'] = 'image/'+i +'.png'
 
 
 
-            recomended.append(ass)
+        #    recomended.append(ass)
+
 
 
     return render(request , 'user.html' , { 'history' :  recomended , 'username' :  request.session['username']  } )
@@ -588,34 +670,54 @@ def changepass(request) :
 
         db.child('users').child(user).child("password").set(  pass2    )
 
-    return redirect('userdetails')
+    return redirect('/userdetails')
 
 
 def deletepost(request ) :
     id = request.POST.get("ids")
 
     # delete the video
-    if path.exists("static/video/" + id + ".mp4") :
-        os.remove("static/video/" + id + ".mp4")
+    #if path.exists("static/video/" + id + ".mp4") :
+    #    os.remove("static/video/" + id + ".mp4")
     # delete the description
-    if path.exists("static/description/" + id + ".json") :
-        os.remove("static/description/" + id + ".json")
+    #if path.exists("static/description/" + id + ".json") :
+    #    os.remove("static/description/" + id + ".json")
 
 
     # delete the png
 
 
-    if path.exists("static/image/" + id + ".png") :
-        os.remove("static/image/" + id + ".png")
+    #if path.exists("static/image/" + id + ".png") :
+    #    os.remove("static/image/" + id + ".png")
 
     # remove comments
+
+    
     db.child("comment").child(id).remove()
     tags = db.child("desctag").child(id).get().val()
+    db.child("desctag").child(id).remove()
+
     if tags != None :
         for tag in tags :
-            db.child("tags").child("tag").child(tag).remove()
-    db.child("desctag").child(id).remove()
-    return redirect('userdetails')
+            db.child("tags").child(tag).child(id).remove()
+
+
+    i = id  
+
+    print(i)
+
+    try : 
+        
+        db.child("name").child(i).remove()
+        
+        db.child("detail").child(i).remove() 
+
+    except : 
+        print( " no such directory")
+        
+           
+
+    return redirect('/')
 
 
 
@@ -623,4 +725,4 @@ def controllog(request ) :
     if request.session['username'] == "jayantanand00@gmail,com" :
         return control(request)
 
-    return redirect('login')
+    return redirect('/login')
