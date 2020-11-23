@@ -51,11 +51,11 @@ def getcount() :
     return data['count']
 
 def imagehandle(f  , name) :
-    with open('static/image/'+name+'.png', 'wb+') as destination:
+    with open('static/image/'+"name"+'.png', 'wb+') as destination:
         for chunk in f.chunks():
             destination.write(chunk)
 
-    storage.child("images/"+name+".png" ).put('static/image/'+name+'.png')
+    storage.child("images/"+name+".png" ).put('static/image/'+"name"+'.png')
 
 
 
@@ -68,7 +68,7 @@ def videohandle(f  , name) :
 def search(request) :
     tx =str(  request.GET.get('search') )
     if tx =='' :
-        return redirect('campgrounds-index')
+        return redirect('/campgrounds-index')
 
 
 
@@ -131,7 +131,7 @@ def search(request) :
 
 
 
-    return render(request , 'campgrounds/index.html' , {'campgrounds' : ret , 'doi' : viewadd , 'username' :  request.session['username']   } )
+    return render(request , 'campgrounds/index.html' , {'campgrounds' : ret , 'doi' : viewadd , 'username' :  request.session['username'] , 'icon' : storage.child("icon.jpg").get_url(None ) , 'background' : storage.child("background.jpg").get_url(None )     } )
 
 
 
@@ -209,7 +209,7 @@ def submit(request) :
 
     return redirect('/')
 def add(request) :
-    return  render(request , 'campgrounds/new.html' , { 'username' :  request.session['username'] })
+    return  render(request , 'campgrounds/new.html' , { 'username' :  request.session['username'] , 'icon' : storage.child("icon.jpg").get_url(None ) , 'background' : storage.child("background.jpg").get_url(None )})
 
 def descadd(request) :
     data = request.POST.get('desc')
@@ -227,8 +227,10 @@ def imgchange(request) :
     with open('static/backgroundimage.jpg', 'wb+') as destination:
         for chunk in f.chunks():
             destination.write(chunk)
+    
+    storage.child("background.jpg" ).put('static/backgroundimage.jpg')
 
-    return redirect('control')
+    return redirect('/control')
 
 def  iconchange(request) :
 
@@ -236,8 +238,14 @@ def  iconchange(request) :
     with open('static/icon.jpg', 'wb+') as destination:
         for chunk in f.chunks():
             destination.write(chunk)
+    
+    storage.child("icon.jpg" ).put('static/icon.jpg')
 
-    return redirect('control')
+
+
+
+
+    return redirect('/control')
 
 def home(request):
 
@@ -251,7 +259,7 @@ def home(request):
         request.session['username'] = None
         
 
-    return render(request, 'landing.html' , {'username' :  request.session['username']  , 'desc' :desc} )
+    return render(request, 'landing.html' , {'username' :  request.session['username']  , 'desc' :desc  , 'icon' : storage.child("icon.jpg").get_url(None ) , 'background' : storage.child("background.jpg").get_url(None )} )
 
 
 def campgroundsindex(request) :
@@ -289,13 +297,18 @@ def campgroundsindex(request) :
     
     
     viewadd = 0
-    user = request.session['username']
+    try  : 
+        user = request.session['username']
+    except  : 
+        user = None 
+        request.session['username'] = None 
 
+        
     vs = db.child('permission').child('post').child(user).get().val()
     if vs != None :
         viewadd = 1
 
-    return render(request , 'campgrounds/index.html' , {'campgrounds' : ret , 'doi' : viewadd , 'username' :  request.session['username']   } )
+    return render(request , 'campgrounds/index.html' , {'campgrounds' : ret , 'doi' : viewadd , 'username' :  request.session['username'] , 'icon' : storage.child("icon.jpg").get_url(None ) , 'background' : storage.child("background.jpg").get_url(None ) } )
 
 
 def campgroundopen(request):
@@ -405,7 +418,7 @@ def campgroundopen(request):
 
 
 
-        return  render(request , 'campgrounds/show.html' , { 'campground' : makeit , 'comments' :  commen , 'recom' :  recomended , 'username' :  request.session['username']   }   )
+        return  render(request , 'campgrounds/show.html' , { 'campground' : makeit , 'comments' :  commen , 'recom' :  recomended , 'username' :  request.session['username']  , 'icon' : storage.child("icon.jpg").get_url(None ) , 'background' : storage.child("background.jpg").get_url(None )}   )
 
 
 
@@ -474,7 +487,7 @@ def login(request):
             return redirect( '/campgrounds-index')
         return redirect('/login')
 
-    return render(request, 'login.html' , { 'username' :  request.session['username']  })
+    return render(request, 'login.html' , { 'username' :  request.session['username'] , 'icon' : storage.child("icon.jpg").get_url(None ) , 'background' : storage.child("background.jpg").get_url(None )})
 
 
 def register(request):
@@ -530,7 +543,7 @@ def register(request):
 
         return redirect('/login')
 
-    return render(request ,  'register.html' , { 'username' :  request.session['username']  })
+    return render(request ,  'register.html' , { 'username' :  request.session['username'] , 'icon' : storage.child("icon.jpg").get_url(None ) , 'background' : storage.child("background.jpg").get_url(None )})
 
 
 
@@ -545,7 +558,7 @@ def control(request) :
     allo = db.child('permission').child('post').get().val()
     allowance = []
     if allo == None :
-        return render(request , 'control.html' , { 'allowance' : []  }  )
+        return render(request , 'control.html' , { 'allowance' : [], 'icon' : storage.child("icon.jpg").get_url(None ) , 'background' : storage.child("background.jpg").get_url(None ) }  )
 
 
     for email in allo :
@@ -560,7 +573,7 @@ def control(request) :
 
 
     #one for deleting comment , done later on
-    return render(request , 'control.html' , { 'allowance' : allowance , 'username' :  request.session['username']    }  )
+    return render(request , 'control.html' , { 'allowance' : allowance , 'username' :  request.session['username'] , 'icon' : storage.child("icon.jpg").get_url(None ) , 'background' : storage.child("background.jpg").get_url(None )  }  )
 
 
 
@@ -654,7 +667,7 @@ def userdetails(request) :
 
 
 
-    return render(request , 'user.html' , { 'history' :  recomended , 'username' :  request.session['username']  } )
+    return render(request , 'user.html' , { 'history' :  recomended , 'username' :  request.session['username']  , 'icon' : storage.child("icon.jpg").get_url(None )} )
 
 
 def logouts(request) :
